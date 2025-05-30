@@ -1,0 +1,43 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+tenv/
+
+
+# VS Code settings
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Environment variable files
+.env
+*.env
+
+# Model and weight files
+*.h5
+*.pt
+*.pkl
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test datasets and generated outputs
+face_dataset/
+violation_screenshots/
+test_dataset/
+
+# Backup and export files
+*.bak
+*.tmp
+export.py
