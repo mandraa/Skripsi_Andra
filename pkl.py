@@ -6,7 +6,7 @@ def view_embedding_values(pkl_file_path="face_recognition_database.pkl", max_sam
     Fungsi untuk melihat dan menampilkan nilai-nilai numerik dari embedding 128 dimensi
     tanpa visualisasi grafik
     
-    Parameters:
+    Parameters::
     - pkl_file_path: Path ke file pickle yang berisi data embedding
     - max_samples: Jumlah maksimum sampel yang akan ditampilkan per nama (default: 3)
     """
@@ -34,7 +34,7 @@ def view_embedding_values(pkl_file_path="face_recognition_database.pkl", max_sam
         first_embedding = embeddings[0]
         embedding_dim = first_embedding.shape[0] if hasattr(first_embedding, 'shape') else len(first_embedding)
         
-        print(f"\n===== INFORMASI EMBEDDING =====")
+        print(f"\n===== INFO EMBEDDING =====")
         print(f"Jumlah total embedding: {len(embeddings)}")
         print(f"Dimensi embedding: {embedding_dim}")
         
@@ -61,7 +61,7 @@ def view_embedding_values(pkl_file_path="face_recognition_database.pkl", max_sam
             print(f"{i+1}. {name}: {count} sampel")
         
         # Tampilkan nilai embedding untuk setiap nama
-        print(f"\n===== NILAI EMBEDDING PER NAMA =====")
+        print(f"\n===== NILAI EMBEDDING PER NAME =====")
         for name in unique_names:
             print(f"\nNama: {name}")
             

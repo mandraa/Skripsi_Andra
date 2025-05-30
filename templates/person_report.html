@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Pelanggaran {{ person_name }} - Sistem Monitoring Pelanggaran Helm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .violation-image {
+            max-height: 150px;
+            object-fit: cover;
+        }
+        .table-responsive {
+            margin-bottom: 30px;
+        }
+        .profile-section {
+            text-align: center;
+            padding: 20px;
+        }
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 5px solid #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="pb-3 mb-4 border-bottom">
+            
+            <div class="d-flex align-items-center justify-content-between">
+                <h1 class="fw-bold fs-2">Laporan Pelanggaran per Orang</h1>
+                <div>
+                    <a href="/beranda" class="btn btn-primary">
+                        Kembali ke Beranda
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Profil Pelanggar</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="profile-section">
+                            <!-- Jika ada foto di face_dataset, bisa ditampilkan di sini -->
+                            <img src="{{ url_for('view_image', image_path=url.image_path) }}" class="profile-image" alt="Foto Profil">
+                            <h4>{{ person_name }}</h4>]
+                            <h4>{{ profile_url }}</h4>
+                            <div class="alert alert-danger">
+                                <strong>Total Pelanggaran:</strong> {{ violations|length }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">Riwayat Pelanggaran</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Jenis Pelanggaran</th>
+                                        <th>Tanggal</th>
+                                        <th>Waktu</th>
+                                        <th>Foto</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for violation in violations %}
+                                    <tr>
+                                        <td>{{ violation.violation_id }}</td>
+                                        <td>{{ violation.violation_type }}</td>
+                                        <td>{{ violation.date_day }}</td>
+                                        <td>{{ violation.time_only }}</td>
+                                        <td>
+                                            {% if violation.image_path %}
+                                            <a href="{{ url_for('view_image', image_path=violation.image_path) }}" target="_blank">
+                                                <img src="{{ url_for('view_image', image_path=violation.image_path) }}" class="img-thumbnail violation-image" alt="Foto pelanggaran">
+                                            </a>
+                                            {% else %}
+                                            <span class="text-muted">Tidak ada foto</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
