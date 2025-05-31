@@ -9,6 +9,7 @@ import sys
 temp = pathlib.PosixPath
 pathlib.PosixPath = pathlib.WindowsPath
 import time
+prev_time = time.time() 
 from datetime import datetime
 from pathlib import Path
 import mtcnn
@@ -55,6 +56,10 @@ similarity_threshold = 0.7  # Cosine similarity threshold for face recognition
 detected_violators = {}  # Dictionary untuk menyimpan pelanggar dan waktu terakhir terdeteksi
 violation_cooldown = 60  # Waktu cooldown dalam detik sebelum pelanggar yang sama bisa dicatat lagi
 recorded_violations = set()  # Set untuk melacak pelanggaran yang sudah dicatat (agar hanya sekali)
+
+fps_start_time = time.time()
+fps_count = 0
+current_fps = 0
 
 def create_database_from_folder(dataset_path="face_dataset", database_path="face_recognition_database.pkl"):
     # Initialize database
@@ -329,6 +334,19 @@ def is_working_hours(work_hours_config):
         return False, "Belum Jam Kerja"
     else:
         return False, "Jam Kerja Telah selesai"
+
+def update_fps():
+    global fps_start_time, fps_count, current_fps
+    fps_count += 1
+    elapsed_time = time.time() - fps_start_time
+    
+    # Update FPS setiap 1 detik
+    if elapsed_time >= 1.0:
+        current_fps = fps_count / elapsed_time
+        fps_count = 0
+        fps_start_time = time.time()
+    
+    return current_fps
     
             
 def save_screenshot(frame, is_violation, person_name="unknown"):
@@ -352,7 +370,7 @@ def save_screenshot(frame, is_violation, person_name="unknown"):
 # --- Combined Detection Run Function ---
 def run_combined_detection(
     weights=ROOT / "best2.pt",  # YOLOv5 model path
-    source="1",  # Webcam source (0 is default)
+    source="http://192.168.1.8:8081/video",  # Webcam source (0 is default)
     database_path="face_recognition_database.pkl",  # Face recognition database
     imgsz=(640, 640),  # YOLOv5 inference size
     conf_thres=0.5,  # YOLOv5 confidence threshold
@@ -403,7 +421,7 @@ def run_combined_detection(
 
     # Dataloader
     print("Starting video capture...")
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture("http://192.168.1.8:8081/video")
     if not cap.isOpened():
         print("Error: Could not open webcam")
         return
@@ -470,6 +488,7 @@ def run_combined_detection(
             print("Error: Could not read frame from webcam")
             break
         
+        fps = update_fps()  # Update FPS
         
         # Tampilkan status sistem pada frame
         if not system_active and check_working_hours:
@@ -480,6 +499,7 @@ def run_combined_detection(
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
             cv2.putText(frame, current_datetime, (10, frame.shape[0] - 30),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+            
             cv2.imshow("Combined Detection System", frame)
             
             # Exit on ESC
@@ -493,6 +513,9 @@ def run_combined_detection(
         # Tambahkan status dan waktu pada tampilan
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cv2.putText(frame, f"SISTEM AKTIF - {current_status}", (10, 30), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        
+        cv2.putText(frame, f"FPS: {fps:.1f}", (10, frame.shape[0] - 60), 
                     cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
         # Make a copy of the frame for face recognition
@@ -650,7 +673,7 @@ def run_combined_detection(
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", type=str, default=ROOT / "best2.pt", help="YOLOv5 model path")
-    parser.add_argument("--source", type=str, default="1", help="video source (1 for webcam)")
+    parser.add_argument("--source", type=str, default="http://192.168.1.8:8081/video", help="video source (1 for webcam)")
     parser.add_argument("--database", type=str, default="face_recognition_database.pkl", help="face recognition database path")
     parser.add_argument("--device", default="", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
     parser.add_argument("--conf-thres", type=float, default=0.5, help="confidence threshold")

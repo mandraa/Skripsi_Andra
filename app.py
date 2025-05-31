@@ -131,7 +131,7 @@ def logout():
     flash('Anda telah logout.', 'info')
     return redirect(url_for('login'))
 
-@app.route('/beranda')
+@app.route('/')
 @login_required
 def beranda():
     """Halaman utama dengan data pelanggaran"""
